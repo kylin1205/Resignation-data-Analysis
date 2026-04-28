@@ -1,4 +1,5 @@
 # 员工离职数据分析系统 - 依赖清单
+
 # Streamlit Web框架
 streamlit>=1.28.0
 
@@ -21,9 +22,6 @@ groq>=0.4.0
 
 # YAML配置
 pyyaml>=6.0
-
-# 数据库
-sqlite3 (内置)
 
 # 日期处理
 python-dateutil>=2.8.0
