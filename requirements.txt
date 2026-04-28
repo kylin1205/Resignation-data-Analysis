@@ -1,0 +1,29 @@
+# 员工离职数据分析系统 - 依赖清单
+# Streamlit Web框架
+streamlit>=1.28.0
+
+# 数据处理
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Excel读写
+openpyxl>=3.1.0
+xlrd>=2.0.1
+
+# 可视化图表
+plotly>=5.18.0
+
+# PDF导出
+reportlab>=4.0.0
+
+# AI大模型（免费Groq API）
+groq>=0.4.0
+
+# YAML配置
+pyyaml>=6.0
+
+# 数据库
+sqlite3 (内置)
+
+# 日期处理
+python-dateutil>=2.8.0
