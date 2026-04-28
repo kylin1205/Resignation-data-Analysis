@@ -40,9 +40,10 @@ class ChartGenerator:
             self.colors['pink']
         ]
 
-    def create_department_bar_chart(self, df: pd.DataFrame) -> go.Figure:
+    def create_department_combined_chart(self, df: pd.DataFrame) -> go.Figure:
         """
-        创建部门离职人数柱状图（降序排列）
+        创建部门离职情况合并图表（纵向柱状图+折线图）
+        过滤掉离职人数为0的部门
 
         Args:
             df: 部门统计数据
@@ -53,105 +54,94 @@ class ChartGenerator:
         if df.empty:
             return self._empty_chart("暂无部门数据")
 
-        # 降序排列
-        df = df.sort_values('departure_count', ascending=True)
+        # 过滤掉离职人数为0的部门
+        df = df[df['departure_count'] > 0].copy()
 
-        fig = go.Figure()
+        if df.empty:
+            return self._empty_chart("暂无离职数据")
 
-        fig.add_trace(go.Bar(
-            y=df['department'],
-            x=df['departure_count'],
-            orientation='h',
-            marker_color=self.colors['primary'],
-            text=df['departure_count'],
-            textposition='outside',
-            textfont=dict(size=12),
-            hovertemplate='<b>%{y}</b><br>离职人数: %{x}人<extra></extra>'
-        ))
+        # 按离职率降序排列
+        df = df.sort_values('attrition_rate', ascending=False)
+
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+        # 柱状图 - 离职人数（纵向，深蓝色）
+        fig.add_trace(
+            go.Bar(
+                x=df['department'],
+                y=df['departure_count'],
+                name='离职人数',
+                marker_color=self.colors['primary'],
+                text=df['departure_count'],
+                textposition='outside',
+                textfont=dict(size=11, color=self.colors['primary']),
+                hovertemplate='<b>%{x}</b><br>离职人数: %{y}人<extra></extra>'
+            ),
+            secondary_y=False
+        )
+
+        # 折线图 - 离职率（红色）
+        fig.add_trace(
+            go.Scatter(
+                x=df['department'],
+                y=df['attrition_rate'],
+                name='离职率(%)',
+                mode='lines+markers+text',
+                marker=dict(
+                    size=10,
+                    color=self.colors['danger'],
+                    symbol='circle'
+                ),
+                line=dict(
+                    color=self.colors['danger'],
+                    width=2
+                ),
+                text=[f'{rate:.2f}%' for rate in df['attrition_rate']],
+                textposition='top center',
+                textfont=dict(size=10, color=self.colors['danger']),
+                hovertemplate='<b>%{x}</b><br>离职率: %{y:.2f}%<extra></extra>'
+            ),
+            secondary_y=True
+        )
 
         fig.update_layout(
             title=dict(
-                text='各部门离职人数',
-                font=dict(size=16, color='#1F2937')
+                text='各部门离职情况',
+                font=dict(size=16, color='#1F2937'),
+                x=0.5
             ),
-            xaxis_title='离职人数',
-            yaxis_title='',
             height=400,
-            margin=dict(l=150, r=50, t=50, b=30),
+            margin=dict(t=60, b=80, l=50, r=50),
             plot_bgcolor='white',
             paper_bgcolor='white',
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.08,
+                xanchor="center",
+                x=0.5,
+                bgcolor='rgba(255,255,255,0.8)'
+            ),
             xaxis=dict(
+                title='',
+                showgrid=False,
+                tickangle=-30,
+                tickfont=dict(size=11)
+            ),
+            yaxis=dict(
+                title='离职人数',
                 showgrid=True,
                 gridwidth=1,
                 gridcolor='#E5E7EB',
                 zeroline=False
             ),
-            yaxis=dict(
+            yaxis2=dict(
+                title='离职率(%)',
                 showgrid=False,
-                tickfont=dict(size=12)
-            )
-        )
-
-        return fig
-
-    def create_department_line_chart(self, df: pd.DataFrame) -> go.Figure:
-        """
-        创建部门离职率折线图（降序排列）
-
-        Args:
-            df: 部门统计数据
-
-        Returns:
-            go.Figure: Plotly图表对象
-        """
-        if df.empty:
-            return self._empty_chart("暂无部门离职率数据")
-
-        # 降序排列
-        df = df.sort_values('attrition_rate', ascending=True)
-
-        fig = go.Figure()
-
-        fig.add_trace(go.Scatter(
-            y=df['department'],
-            x=df['attrition_rate'],
-            mode='lines+markers+text',
-            marker=dict(
-                size=12,
-                color=self.colors['danger'],
-                symbol='circle'
-            ),
-            line=dict(
-                color=self.colors['danger'],
-                width=2
-            ),
-            text=[f'{rate:.2f}%' for rate in df['attrition_rate']],
-            textposition='middle right',
-            textfont=dict(size=11, color=self.colors['danger']),
-            hovertemplate='<b>%{y}</b><br>离职率: %{x:.2f}%<extra></extra>'
-        ))
-
-        fig.update_layout(
-            title=dict(
-                text='各部门离职率',
-                font=dict(size=16, color='#1F2937')
-            ),
-            xaxis_title='离职率 (%)',
-            yaxis_title='',
-            height=400,
-            margin=dict(l=150, r=80, t=50, b=30),
-            plot_bgcolor='white',
-            paper_bgcolor='white',
-            xaxis=dict(
-                showgrid=True,
-                gridwidth=1,
-                gridcolor='#E5E7EB',
-                zeroline=False,
+                overlaying='y',
+                side='right',
                 ticksuffix='%'
-            ),
-            yaxis=dict(
-                showgrid=False,
-                tickfont=dict(size=12)
             )
         )
 
@@ -253,7 +243,7 @@ class ChartGenerator:
 
     def create_reason_bar_chart(self, df: pd.DataFrame, max_items: int = 10) -> go.Figure:
         """
-        创建离职原因柱状图（降序排列）
+        创建离职原因柱状图（纵向分布，降序排列）
 
         Args:
             df: 离职原因分布数据
@@ -266,41 +256,42 @@ class ChartGenerator:
             return self._empty_chart("暂无离职原因数据")
 
         # 降序排列并限制数量
-        df = df.sort_values('count', ascending=True).tail(max_items)
+        df = df.sort_values('count', ascending=False).head(max_items)
 
         fig = go.Figure()
 
         fig.add_trace(go.Bar(
-            y=df['category'],
-            x=df['count'],
-            orientation='h',
+            x=df['category'],
+            y=df['count'],
             marker_color=self.colors['accent'],
             text=df['count'],
             textposition='outside',
-            textfont=dict(size=11),
-            hovertemplate='<b>%{y}</b><br>人数: %{x}人<extra></extra>'
+            textfont=dict(size=11, color=self.colors['accent']),
+            hovertemplate='<b>%{x}</b><br>人数: %{y}人<extra></extra>'
         ))
 
         fig.update_layout(
             title=dict(
                 text='离职原因分布',
-                font=dict(size=16, color='#1F2937')
+                font=dict(size=16, color='#1F2937'),
+                x=0.5
             ),
-            xaxis_title='离职人数',
-            yaxis_title='',
+            xaxis_title='',
+            yaxis_title='离职人数',
             height=350,
-            margin=dict(l=150, r=50, t=50, b=30),
+            margin=dict(l=50, r=50, t=50, b=80),
             plot_bgcolor='white',
             paper_bgcolor='white',
             xaxis=dict(
+                showgrid=False,
+                tickangle=-30,
+                tickfont=dict(size=10)
+            ),
+            yaxis=dict(
                 showgrid=True,
                 gridwidth=1,
                 gridcolor='#E5E7EB',
                 zeroline=False
-            ),
-            yaxis=dict(
-                showgrid=False,
-                tickfont=dict(size=11)
             )
         )
 
@@ -308,7 +299,7 @@ class ChartGenerator:
 
     def create_level_bar_chart(self, df: pd.DataFrame) -> go.Figure:
         """
-        创建职级分布柱状图（降序排列）
+        创建职级分布柱状图（纵向分布，降序排列）
 
         Args:
             df: 职级分布数据
@@ -320,41 +311,41 @@ class ChartGenerator:
             return self._empty_chart("暂无职级数据")
 
         # 降序排列
-        df = df.sort_values('count', ascending=True)
+        df = df.sort_values('count', ascending=False)
 
         fig = go.Figure()
 
         fig.add_trace(go.Bar(
-            y=df['category'],
-            x=df['count'],
-            orientation='h',
+            x=df['category'],
+            y=df['count'],
             marker_color=self.colors['purple'],
             text=df['count'],
             textposition='outside',
-            textfont=dict(size=12),
-            hovertemplate='<b>%{y}</b><br>人数: %{x}人<extra></extra>'
+            textfont=dict(size=11, color=self.colors['purple']),
+            hovertemplate='<b>%{x}</b><br>人数: %{y}人<extra></extra>'
         ))
 
         fig.update_layout(
             title=dict(
                 text='离职职级分布',
-                font=dict(size=16, color='#1F2937')
+                font=dict(size=16, color='#1F2937'),
+                x=0.5
             ),
-            xaxis_title='离职人数',
-            yaxis_title='',
+            xaxis_title='',
+            yaxis_title='离职人数',
             height=350,
-            margin=dict(l=100, r=50, t=50, b=30),
+            margin=dict(l=50, r=50, t=50, b=50),
             plot_bgcolor='white',
             paper_bgcolor='white',
             xaxis=dict(
+                showgrid=False,
+                tickfont=dict(size=11)
+            ),
+            yaxis=dict(
                 showgrid=True,
                 gridwidth=1,
                 gridcolor='#E5E7EB',
                 zeroline=False
-            ),
-            yaxis=dict(
-                showgrid=False,
-                tickfont=dict(size=12)
             )
         )
 

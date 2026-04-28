@@ -23,42 +23,76 @@ st.set_page_config(
     page_title="员工离职数据分析系统",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # 隐藏Streamlit默认样式
 st.markdown("""
 <style>
-    /* 隐藏默认header */
+    /* 隐藏默认header和footer */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 
-    /* 指标卡片样式 */
-    .metric-card {
-        background: white;
-        border-radius: 10px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .metric-value {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #4F46E5;
-    }
-    .metric-label {
-        font-size: 0.9rem;
-        color: #6B7280;
-        margin-top: 5px;
+    /* 侧边栏样式优化 */
+    .css-1d391kg {
+        padding-top: 1rem;
     }
 
-    /* 图表容器 */
-    .chart-container {
-        background: white;
-        border-radius: 10px;
-        padding: 15px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    /* 指标卡片样式 */
+    div[data-testid="stMetricValue"] {
+        font-size: 2.2rem !important;
+        font-weight: 700 !important;
+        color: #4F46E5 !important;
     }
+
+    div[data-testid="stMetricLabel"] {
+        font-size: 0.9rem !important;
+        color: #6B7280 !important;
+    }
+
+    /* 图表容器样式 */
+    .streamlit-expanderHeader {
+        background-color: #f8fafc;
+        border-radius: 8px;
+    }
+
+    /* 子标题样式 */
+    h3 {
+        color: #1F2937 !important;
+        font-weight: 600 !important;
+        margin-top: 1rem !important;
+    }
+
+    /* 标签页样式 */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        padding: 10px 20px;
+        border-radius: 8px 8px 0 0;
+    }
+
+    /* 按钮样式优化 */
+    .stButton > button {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    /* 数据框样式 */
+    .dataframe {
+        border: none !important;
+    }
+
+    div[data-testid="stDataFrame"] {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+    }
+
+    /* 风险标签 */
+    .risk-high {color: #EF4444; font-weight: bold;}
+    .risk-medium {color: #F59E0B; font-weight: bold;}
+    .risk-low {color: #10B981; font-weight: bold;}
 
     /* AI分析框 */
     .ai-analysis {
@@ -68,10 +102,10 @@ st.markdown("""
         color: white;
     }
 
-    /* 风险标签 */
-    .risk-high {color: #EF4444; font-weight: bold;}
-    .risk-medium {color: #F59E0B; font-weight: bold;}
-    .risk-low {color: #10B981; font-weight: bold;}
+    /* 卡片阴影效果 */
+    .element-container {
+        margin-bottom: 0.5rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -228,30 +262,31 @@ def main():
     # 主内容区
     if not st.session_state.data_loaded:
         # 欢迎页面
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown("""
-            <div style="text-align: center; padding: 50px 20px;">
-                <h2>👋 欢迎使用员工离职数据分析系统</h2>
-                <p style="color: #6B7280; margin-top: 20px;">
-                    请在左侧上传包含期初/期末人数和离职数据的Excel文件开始分析
-                </p>
+        st.markdown("""
+        <div style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; margin-bottom: 30px;">
+            <h1 style="color: white; margin-bottom: 15px; font-size: 2.5rem;">👋 欢迎使用员工离职数据分析系统</h1>
+            <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem;">
+                请在左侧上传包含期初/期末人数和离职数据的Excel文件开始分析
+            </p>
+        </div>
 
-                <div style="margin-top: 40px; text-align: left; background: #F3F4F6; padding: 20px; border-radius: 10px;">
-                    <h4>📋 Excel文件应包含以下Sheet：</h4>
-                    <ul style="color: #4B5563;">
-                        <li><b>期初人数Sheet</b>：如"1月期初人数"、"2月期初人数"</li>
-                        <li><b>离职数据Sheet</b>：如"离职数据"</li>
-                    </ul>
-
-                    <h4 style="margin-top: 20px;">🔢 系统将自动计算：</h4>
-                    <ul style="color: #4B5563;">
-                        <li>月度离职率 = 离职人数 / 平均人数 × 100%</li>
-                        <li>平均人数 = (期初人数 + 期末人数) / 2</li>
-                    </ul>
-                </div>
+        <div style="display: flex; gap: 20px; margin-top: 30px;">
+            <div style="flex: 1; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <h3 style="color: #4F46E5; margin-bottom: 15px;">📋 Excel文件应包含以下Sheet</h3>
+                <ul style="color: #4B5563; line-height: 2;">
+                    <li><b>期初人数Sheet</b>：如"1月期初人数"、"2月期初人数"</li>
+                    <li><b>离职数据Sheet</b>：如"离职数据"</li>
+                </ul>
             </div>
-            """, unsafe_allow_html=True)
+            <div style="flex: 1; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                <h3 style="color: #10B981; margin-bottom: 15px;">🔢 系统将自动计算</h3>
+                <ul style="color: #4B5563; line-height: 2;">
+                    <li>月度离职率 = 离职人数 / 平均人数 × 100%</li>
+                    <li>平均人数 = (期初人数 + 期末人数) / 2</li>
+                </ul>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
         return
 
     # 数据加载后的主界面
@@ -372,23 +407,13 @@ def main():
         st.session_state.departures_df['month_key'] == selected_month
     ]
 
-    # 1. 部门分析 - 柱状图 + 折线图
+    # 1. 部门分析 - 合并的柱状图+折线图
     st.markdown("#### 各部门离职情况")
-    col1, col2 = st.columns(2)
-
-    with col1:
-        if not dept_stats.empty:
-            fig_bar = chart_gen.create_department_bar_chart(dept_stats)
-            st.plotly_chart(fig_bar, use_container_width=True)
-        else:
-            st.info("暂无部门数据")
-
-    with col2:
-        if not dept_stats.empty:
-            fig_line = chart_gen.create_department_line_chart(dept_stats)
-            st.plotly_chart(fig_line, use_container_width=True)
-        else:
-            st.info("暂无离职率数据")
+    if not dept_stats.empty:
+        fig_combined = chart_gen.create_department_combined_chart(dept_stats)
+        st.plotly_chart(fig_combined, use_container_width=True)
+    else:
+        st.info("暂无部门数据")
 
     # 2. 离职类型 + 司龄分布 - 饼图
     st.markdown("#### 离职类型与司龄分布")
