@@ -1,3 +1,14 @@
+---
+AIGC:
+    ContentProducer: Minimax Agent AI
+    ContentPropagator: Minimax Agent AI
+    Label: AIGC
+    ProduceID: b5542fe75334d738382bc4b9ecfe3948
+    PropagateID: b5542fe75334d738382bc4b9ecfe3948
+    ReservedCode1: 304502203062c0ac99085a81b6ee7f55478c052c34db6a53c0df981e2fde678044b95b42022100a5db1b3992f11f19c5cb37bdc0e7ccbe89aa22d24d1df3cc3771e55d10bb0273
+    ReservedCode2: 3045022100ba18ec4a31ed68f7dde748ec53887f27539d3af43b4a0ac3dcabac6b187dfe02022010c3c35c62b852323ed9049bbe215739fc407bfd34c525fee6202d6c7aebefc0
+---
+
 # 员工离职数据分析系统 - 产品需求文档 V3.0
 
 ## 文档信息

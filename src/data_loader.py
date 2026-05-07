@@ -90,9 +90,9 @@ class DataLoader:
         """
         import re
 
-        # 期初人数Sheet: "X月期初人数" 或 "X月期初人数（Y月期末人数）"
-        qichu_pattern = re.compile(r'(\d{1,2})月期初人数')
-        # 期末人数Sheet: "X月期末人数（Y月期初数据）" 或 "X月期末数据（Y月期初数据）"
+        # 期初人数Sheet: "X月期初人数"、"X月期初数据"
+        qichu_pattern = re.compile(r'(\d{1,2})月(期初数据|期初人数)')
+        # 期末人数Sheet: "X月期末数据"、"X月期末人数"
         qimo_pattern = re.compile(r'(\d{1,2})月(?:期末数据|期末人数)')
 
         # 尝试匹配期初
