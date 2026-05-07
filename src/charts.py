@@ -74,7 +74,7 @@ class ChartGenerator:
                 marker_color=self.colors['primary'],
                 text=df['departure_count'],
                 textposition='outside',
-                textfont=dict(size=11, color=self.colors['primary']),
+                textfont=dict(size=12, color=self.colors['primary'], family='Arial'),
                 hovertemplate='<b>%{x}</b><br>离职人数: %{y}人<extra></extra>'
             ),
             secondary_y=False
@@ -88,17 +88,17 @@ class ChartGenerator:
                 name='离职率(%)',
                 mode='lines+markers+text',
                 marker=dict(
-                    size=10,
+                    size=12,
                     color=self.colors['danger'],
                     symbol='circle'
                 ),
                 line=dict(
                     color=self.colors['danger'],
-                    width=2
+                    width=3
                 ),
                 text=[f'{rate:.2f}%' for rate in df['attrition_rate']],
                 textposition='top center',
-                textfont=dict(size=10, color=self.colors['danger']),
+                textfont=dict(size=11, color=self.colors['danger'], family='Arial'),
                 hovertemplate='<b>%{x}</b><br>离职率: %{y:.2f}%<extra></extra>'
             ),
             secondary_y=True
@@ -106,42 +106,56 @@ class ChartGenerator:
 
         fig.update_layout(
             title=dict(
-                text='各部门离职情况',
-                font=dict(size=16, color='#1F2937'),
-                x=0.5
+                text='<b>各部门离职情况</b>',
+                font=dict(size=18, color='#1F2937', family='Arial'),
+                x=0.5,
+                y=0.98,
+                xanchor='center',
+                yanchor='top'
             ),
-            height=400,
-            margin=dict(t=60, b=80, l=50, r=50),
+            height=420,
+            margin=dict(t=80, b=100, l=60, r=60),
             plot_bgcolor='white',
             paper_bgcolor='white',
             showlegend=True,
             legend=dict(
                 orientation="h",
                 yanchor="bottom",
-                y=1.08,
+                y=-0.35,
                 xanchor="center",
                 x=0.5,
-                bgcolor='rgba(255,255,255,0.8)'
+                bgcolor='rgba(255,255,255,0.9)',
+                bordercolor='#E5E7EB',
+                borderwidth=1,
+                font=dict(size=12, color='#1F2937')
             ),
             xaxis=dict(
                 title='',
                 showgrid=False,
-                tickangle=-30,
-                tickfont=dict(size=11)
+                tickangle=-45,
+                tickfont=dict(size=11, color='#1F2937'),
+                automargin=True
             ),
             yaxis=dict(
                 title='离职人数',
+                titlefont=dict(size=12, color=self.colors['primary']),
                 showgrid=True,
                 gridwidth=1,
-                gridcolor='#E5E7EB',
-                zeroline=False
+                gridcolor='#F3F4F6',
+                zeroline=True,
+                zerolinecolor='#E5E7EB',
+                automargin=True
             ),
             yaxis2=dict(
                 title='离职率(%)',
+                titlefont=dict(size=12, color=self.colors['danger']),
                 showgrid=False,
                 overlaying='y',
                 side='right',
-                ticksuffix='%'
+                ticksuffix='%',
+                zeroline=True,
+                zerolinecolor='#E5E7EB',
+                automargin=True
             )
         )
 
