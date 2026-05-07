@@ -74,7 +74,6 @@ class ChartGenerator:
                 marker_color=self.colors['primary'],
                 text=df['departure_count'],
                 textposition='outside',
-                textfont=dict(size=12, color=self.colors['primary'], family='Arial'),
                 hovertemplate='<b>%{x}</b><br>离职人数: %{y}人<extra></extra>'
             ),
             secondary_y=False
@@ -98,7 +97,6 @@ class ChartGenerator:
                 ),
                 text=[f'{rate:.2f}%' for rate in df['attrition_rate']],
                 textposition='top center',
-                textfont=dict(size=11, color=self.colors['danger'], family='Arial'),
                 hovertemplate='<b>%{x}</b><br>离职率: %{y:.2f}%<extra></extra>'
             ),
             secondary_y=True
@@ -106,8 +104,8 @@ class ChartGenerator:
 
         fig.update_layout(
             title=dict(
-                text='<b>各部门离职情况</b>',
-                font=dict(size=18, color='#1F2937', family='Arial'),
+                text='各部门离职情况',
+                font=dict(size=18, color='#1F2937'),
                 x=0.5,
                 y=0.98,
                 xanchor='center',
@@ -126,19 +124,16 @@ class ChartGenerator:
                 x=0.5,
                 bgcolor='rgba(255,255,255,0.9)',
                 bordercolor='#E5E7EB',
-                borderwidth=1,
-                font=dict(size=12, color='#1F2937')
+                borderwidth=1
             ),
             xaxis=dict(
                 title='',
                 showgrid=False,
                 tickangle=-45,
-                tickfont=dict(size=11, color='#1F2937'),
                 automargin=True
             ),
             yaxis=dict(
                 title='离职人数',
-                titlefont=dict(size=12, color=self.colors['primary']),
                 showgrid=True,
                 gridwidth=1,
                 gridcolor='#F3F4F6',
@@ -148,7 +143,6 @@ class ChartGenerator:
             ),
             yaxis2=dict(
                 title='离职率(%)',
-                titlefont=dict(size=12, color=self.colors['danger']),
                 showgrid=False,
                 overlaying='y',
                 side='right',
