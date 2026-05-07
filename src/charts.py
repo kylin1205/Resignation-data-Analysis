@@ -87,13 +87,13 @@ class ChartGenerator:
                 name='离职率(%)',
                 mode='lines+markers+text',
                 marker=dict(
-                    size=12,
+                    size=10,
                     color=self.colors['danger'],
                     symbol='circle'
                 ),
                 line=dict(
                     color=self.colors['danger'],
-                    width=3
+                    width=2
                 ),
                 text=[f'{rate:.2f}%' for rate in df['attrition_rate']],
                 textposition='top center',
@@ -107,22 +107,22 @@ class ChartGenerator:
                 text='各部门离职情况',
                 font=dict(size=18, color='#1F2937'),
                 x=0.5,
-                y=0.98,
+                y=1.0,
                 xanchor='center',
                 yanchor='top'
             ),
-            height=420,
-            margin=dict(t=80, b=100, l=60, r=60),
+            height=450,
+            margin=dict(t=60, b=120, l=50, r=60),
             plot_bgcolor='white',
             paper_bgcolor='white',
             showlegend=True,
             legend=dict(
                 orientation="h",
-                yanchor="bottom",
-                y=-0.35,
+                yanchor="top",
+                y=-0.25,
                 xanchor="center",
                 x=0.5,
-                bgcolor='rgba(255,255,255,0.9)',
+                bgcolor='rgba(255,255,255,0.95)',
                 bordercolor='#E5E7EB',
                 borderwidth=1
             ),
@@ -130,6 +130,7 @@ class ChartGenerator:
                 title='',
                 showgrid=False,
                 tickangle=-45,
+                tickmode='linear',
                 automargin=True
             ),
             yaxis=dict(
@@ -147,8 +148,7 @@ class ChartGenerator:
                 overlaying='y',
                 side='right',
                 ticksuffix='%',
-                zeroline=True,
-                zerolinecolor='#E5E7EB',
+                zeroline=False,
                 automargin=True
             )
         )
